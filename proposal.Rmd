@@ -18,3 +18,7 @@ head(movie)
 ```
 
 This data set that came from IMDb, includes data about the 1,000 most popular movies that came out from 2006 - 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some dirtier variables like Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the data we use.  
+
+For analysis, we will be able to examine a variety of questions. First we plan to find which actors and directors are most commonly involved with successful movies. We can define success by looking at a movie's rating or its revenue. We will have to use the separate function to extract the 'Actors' column into multiple columns, i.e., 'Actor1', 'Actor2', etc. From there we can find the average movie rating and revenue on an actor specific basis.
+
+We will also dive into what factors are correlated with a higher rating/revenue. We will examine the genre, runtime, and votes variables to see if they have any significance in predicting rating and revenue. We will also explore the possibility of merging multiple datasets to add in a column stating a movie's budget. This variable could also help explain a movie's rating/revenue so we would like to explore that too. 
