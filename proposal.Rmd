@@ -1,28 +1,20 @@
 ---
 title: "Proposal"
 output: html_document
+authors: Ashley Anderson, Cameron Stocker, Sam Zhang, & Tyler Kruzan
 ---
+## Team Members:
+Project Coordinator: Ashley Anderson
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Cameron Stocker, Sam Zhang, & Tyler Kruzan
+
+Link to Dataset can be found on Kaggle or through this link: https://www.kaggle.com/PromptCloudHQ/imdb-data
+
+```{r}
+movie = read.csv("IMDB-Movie-Data.csv")
+str(movie)
+summary(movie)
+head(movie)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+This data set that came from IMDb, includes data about the 1,000 most popular movies that came out from 2006 - 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some dirtier variables like Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the data we use.  
