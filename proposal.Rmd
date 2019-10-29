@@ -33,7 +33,7 @@ This data set that came from IMDb, includes data about the 1,000 most popular mo
 
 IMDb, which stands for Internet Movie Database, is an online source for data associated with films, TV shows, video games, and other streamable content. For each title, users can find information relating to the starring cast, producers, and plot summaries, as well as both critic and fan reviews. As of May 2019, IMDb had 83 million registered users and approximately 6 million titles, including 516,726 feature films. IMDb ratings are based on user ratings on a scale from 1 to 10. The raw ratings are then filtered and weighted, creating a weighted mean rating for each film. The formula for calculating the weighted rating is $W = \frac{R*v + C*m}{v+m}$, where $R$ is the raw average, $v$ is the number of votes, $m$ is the minimum votes required to be included in the Top 250 (which is currently 25,000), and $C$ is the mean vote for the reports (which is currently 7.0).
 
-| Dataset's Columns  | Description      |
+| Dataset Variables  | Description      |
 | ------------------ | ---------------- |
 | Rank               | Movie Rank Order |
 | Title              | Tite of the film |
@@ -54,6 +54,6 @@ For analysis, we will be able to examine a variety of questions. First we plan t
 
 We will also dive into what factors are correlated with a higher rating/revenue. We will examine the genre, runtime, and votes variables to see if they have any significance in predicting rating and revenue. This can be done through ploting the dataset. 
 
-We will examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
+We also plan to examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
 
-We will also explore the possibility of merging multiple datasets to add in a columns like stating a movie's budget. This can be done through using the join methods. Joined information could help explain a movie's rating/revenue. 
+Additionally, we will explore the possibility of merging multiple datasets to add in a columns like stating a movie's budget. This can be done through using the join methods. Joined information could help explain a movie's rating/revenue. 
