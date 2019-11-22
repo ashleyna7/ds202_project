@@ -1,8 +1,9 @@
 ---
-title: "Proposal"
+title: "Project Report"
 output: html_document
-authors: Ashley Anderson, Cameron Stocker, Sam Zhang, & Tyler Kruzan
+authors: Ashley Anderson, Cameron Stocker, Hexiang Zhang, & Tyler Kruzan
 ---
+
 #### Team Members:
 
 Project Coordinator: Ashley Anderson
@@ -51,3 +52,13 @@ For analysis, we will be able to examine a variety of questions. First we plan t
 We will also dive into what factors are correlated with a higher rating/revenue. We will examine the genre, runtime, and votes variables to see if they have any significance in predicting rating and revenue. This can be done through ploting the dataset. 
 
 We also plan to examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
+
+####Cleaning the Data
+
+Here we have separated the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4. We did this so that we can analyze individual actors. We also dropped the Rank and Description columns as we will not use them in our analysis. Next we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name.
+
+```{r}
+movie = movie %>% separate("Actors", sep = ", ", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
+movie = movie %>% select(-Rank, -Description)
+names(movie)[c(9,12)] = c("Runtime", "Revenue")
+```
