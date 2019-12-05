@@ -45,7 +45,8 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 | Revenue (Millions) | Movie revenue in millions |
 | Metascore          | An aggregated average of critic scores. Values are between 0 and 100. Higher scores represent positive reviews. |
 
-#### Exploratory Analysis
+#### Pipeline
+*overview of process
 
 For analysis, we will be able to examine a variety of questions. First we plan to find which actors and directors are most commonly involved with successful movies. We can define success by looking at a movie's rating or its revenue. We will extract using the separate method and clean the 'Actors' column into multiple rows. From there we can find the average movie rating and revenue on an actor specific basis.
 
@@ -53,7 +54,7 @@ We will also dive into what factors are correlated with a higher rating/revenue.
 
 We also plan to examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
 
-####Cleaning the Data
+####Data Cleaning and Wrangling 
 
 Here we have separated the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4. We did this so that we can analyze individual actors. We also dropped the Rank and Description columns as we will not use them in our analysis. Next we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name.
 
@@ -74,3 +75,49 @@ movie = movie %>%
   spread(Genre, yesno, fill = 0)
 
 ```
+
+####Exploratory Data Analysis
+
+Which actors and directors are most successful?
+```{r}
+
+```
+
+What factors are correlated with high ratings and revenue?
+```{r}
+
+```
+
+What relationships are there in movie performances over time?
+```{r}
+
+```
+
+How correlated are ‘success’ variables? (ratings, revenue, metascore)
+```{r}
+
+```
+
+How do fan votes compare to ‘success’?
+```{r}
+
+```
+
+Analysis of the most successful directors and actors
+```{r}
+
+```
+
+####Conclusion
+
+
+
+####Team Participation
+
+Ashley:
+
+Tyler:
+
+Hexiang:
+
+Cameron:
