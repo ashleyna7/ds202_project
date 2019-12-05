@@ -19,16 +19,13 @@ Link to Dataset can be found on Kaggle or through this link: https://www.kaggle.
 ```{r}
 # Load dataset
 movie = read.csv("IMDB-Movie-Data.csv")
-str(movie)
-summary(movie)
-head(movie)
 ```
 
 #### Background
 
-This data set that came from IMDb, includes data about the 1,000 most popular movies that came out from 2006 - 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some dirtier variables like Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the data we use.
+Our choice of a data set came from IMDb and includes data about the 1,000 most popular movies that came out between 2006 and 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some messy variables such as Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the final data we use.
 
-IMDb, which stands for Internet Movie Database, is an online source for data associated with films, TV shows, video games, and other streamable content. For each title, users can find information relating to the starring cast, producers, and plot summaries, as well as both critic and fan reviews. As of May 2019, IMDb had 83 million registered users and approximately 6 million titles, including 516,726 feature films. IMDb ratings are based on user ratings on a scale from 1 to 10. The raw ratings are then filtered and weighted, creating a weighted mean rating for each film. The formula for calculating the weighted rating is $W = \frac{R*v + C*m}{v+m}$, where $R$ is the raw average, $v$ is the number of votes, $m$ is the minimum votes required to be included in the Top 250 (which is currently 25,000), and $C$ is the mean vote for the reports (which is currently 7.0).
+IMDb, which stands for Internet Movie Database, is an online source for data associated with films, TV shows, video games, and other streamable content. For each title, users can find information relating to the starring cast, producers, and plot summaries, as well as both critic and fan reviews. As of May 2019, IMDb had 83 million registered users and approximately 6 million titles, including 516,726 feature films. IMDb ratings are based on user ratings on a scale from 1 to 10. The raw ratings are then filtered and weighted, creating a weighted mean rating for each film. The formula for calculating the weighted rating is $W = \frac{R*v + C*m}{v+m}$, where $R$ is the raw average, $v$ is the number of votes, $m$ is the minimum votes required to be included in the Top 250 (which is currently 25,000), and $C$ is the mean vote for the reports (which is currently 7.0). Below is a table of all variables in the dataset as well as a description for each variable. 
 
 | Dataset Variables  | Description      |
 | ------------------ | ---------------- |
@@ -46,35 +43,64 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 | Metascore          | An aggregated average of critic scores. Values are between 0 and 100. Higher scores represent positive reviews. |
 
 #### Pipeline
-*overview of process
 
-For analysis, we will be able to examine a variety of questions. First we plan to find which actors and directors are most commonly involved with successful movies. We can define success by looking at a movie's rating or its revenue. We will extract using the separate method and clean the 'Actors' column into multiple rows. From there we can find the average movie rating and revenue on an actor specific basis.
+We begin by describing our plan of attack for the project. Beginning with the raw data set, we start with some exploration in order to see what needed to be fix or removed. We then move on to wrangling and cleaning the data based on what we found during the exploration.  
 
-We will also dive into what factors are correlated with a higher rating/revenue. We will examine the genre, runtime, and votes variables to see if they have any significance in predicting rating and revenue. This can be done through ploting the dataset. 
+For analysis, we will examine a variety of questions. First we find which actors and directors are most commonly involved with successful movies. We define success by looking at a movie's rating, revenue, or metascore. We use the separate method in the 'Actors' column to move it into multiple columns. From there, we find the average movie rating and revenue on an actor and director specific basis.
 
-We also plan to examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
+We also dive into what factors are correlated with a high rating and revenue. We examine the genre, runtime, and votes to see if they have any significance in predicting rating or revenue. This can be done through ploting the dataset. 
 
-####Data Cleaning and Wrangling 
+We also examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
 
-Here we have separated the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4. We did this so that we can analyze individual actors. We also dropped the Rank and Description columns as we will not use them in our analysis. Next we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name.
+Additionally, we explore the correlation of the variables we define as success: ratings, revenue, and metascore. We also compare these success variables to how fans recieved the movie by using the variable 'votes'. 
+
+Lastly, we end with an analysis of the most successful directors and actors. We do this by taking the most "successful" directors and actors in terms of the success variables and exploring if there is any other reasons why they are so successful.  
+
+
+####Data Exploration, Cleaning and Wrangling 
+
+We can see from the structure of the data set that each variable type seems to be correct, so no changes were needed there. However, we noticed that there were some problems.
 
 ```{r}
-library(tidyr)
-library(dplyr)
+str(movie)
+summary(movie)
+head(movie)
+```
 
-movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
-movie = movie %>% select(-Rank, -Description)
-names(movie)[c(9,12)] = c("Runtime", "Revenue")
+First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we
 
+```{r}
+colSums(is.na(movie))
+#movie <- movie %>% drop_na()
+```
 
+Second, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
+
+```{r}
+library(tidyverse)
 movie = separate_rows(movie, Genre, sep = ",")
-
 movie = movie %>%
   mutate(yesno = 1) %>%
   distinct %>%
   spread(Genre, yesno, fill = 0)
-
 ```
+
+Next, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will somehow need to isolate each actor fo reach movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
+
+```{r}
+movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
+```
+
+Lastly, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
+
+```{r}
+movie = movie %>% select(-Rank, -Description)
+names(movie)[c(9,12)] = c("Runtime", "Revenue")
+```
+
+
+***We also analyzed the amount of NAs in each column. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we
+
 
 ####Exploratory Data Analysis
 
