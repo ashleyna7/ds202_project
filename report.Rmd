@@ -78,7 +78,7 @@ Second, some of the variables are messy or need renamed. We decided to drop the 
 
 ```{r}
 movie = movie %>% select(-Rank, -Description)
-names(movie)[c(9,12)] = c("Runtime", "Revenue")
+names(movie)[c(6,9)] = c("Runtime", "Revenue")
 ```
 
 Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
