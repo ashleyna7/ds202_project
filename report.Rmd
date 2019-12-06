@@ -74,7 +74,14 @@ colSums(is.na(movie))
 #movie <- movie %>% drop_na()
 ```
 
-Second, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
+Second, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
+
+```{r}
+movie = movie %>% select(-Rank, -Description)
+names(movie)[c(9,12)] = c("Runtime", "Revenue")
+```
+
+Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
 
 ```{r}
 library(tidyverse)
@@ -85,21 +92,11 @@ movie = movie %>%
   spread(Genre, yesno, fill = 0)
 ```
 
-Next, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will somehow need to isolate each actor fo reach movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
+Lastly, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will somehow need to isolate each actor fo reach movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
 
 ```{r}
 movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
 ```
-
-Lastly, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
-
-```{r}
-movie = movie %>% select(-Rank, -Description)
-names(movie)[c(9,12)] = c("Runtime", "Revenue")
-```
-
-
-***We also analyzed the amount of NAs in each column. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we
 
 
 ####Exploratory Data Analysis
