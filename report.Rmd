@@ -4,24 +4,24 @@ output: html_document
 authors: Ashley Anderson, Cameron Stocker, Hexiang Zhang, & Tyler Kruzan
 ---
 
-#### Team Members:
+### Team Members:
 
 Project Coordinator: Ashley Anderson
 
-Cameron Stocker, Hexiang Zhang, & Tyler Kruzan
+Team Members: Cameron Stocker, Hexiang Zhang, & Tyler Kruzan
 
-#### Dataset Link
 
-Link to Dataset can be found on Kaggle or through this link: https://www.kaggle.com/PromptCloudHQ/imdb-data
+### Dataset Overview
 
-#### Dataset Overview
+The dataset can be found on Kaggle or through this link:   
+https://www.kaggle.com/PromptCloudHQ/imdb-data
 
 ```{r}
 # Load dataset
 movie = read.csv("IMDB-Movie-Data.csv")
 ```
 
-#### Background
+### Background
 
 Our choice of a data set came from IMDb and includes data about the 1,000 most popular movies that came out between 2006 and 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some messy variables such as Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the final data we use.
 
@@ -42,7 +42,7 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 | Revenue (Millions) | Movie revenue in millions |
 | Metascore          | An aggregated average of critic scores. Values are between 0 and 100. Higher scores represent positive reviews. |
 
-#### Pipeline
+### Pipeline
 
 We begin by describing our plan of attack for the project. Beginning with the raw data set, we start with some exploration in order to see what needed to be fix or removed. We then move on to wrangling and cleaning the data based on what we found during the exploration.  
 
@@ -57,19 +57,21 @@ Additionally, we explore the correlation of the variables we define as success: 
 Lastly, we end with an analysis of the most successful directors and actors. We do this by taking the most "successful" directors and actors in terms of the success variables and exploring if there is any other reasons why they are so successful.  
 
 
-####Data Exploration, Cleaning and Wrangling 
+###Data Exploration, Cleaning and Wrangling 
 
 We can see from the structure of the data set that each variable type seems to be correct, so no changes were needed there. However, we noticed that there were some problems.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+#Install Packages
 library(tidyverse)
 library(ggplot2)
+
 str(movie)
 summary(movie)
 head(movie)
 ```
 
-First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we
+First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we removed all rows that contained any NAs.
 
 ```{r}
 
@@ -108,14 +110,14 @@ movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Ac
 ```
 
 
-####Exploratory Data Analysis
+###Data Analysis
 
-Which actors and directors are most successful?
+* Which actors and directors are most successful?
 ```{r}
 
 ```
 
-What factors are correlated with high ratings and revenue?
+* What factors are correlated with high ratings and revenue?
 ```{r}
 
 movie2 = movie %>%
@@ -126,18 +128,17 @@ ggplot(movie2, aes(x = Runtime, y = mean_rev)) + geom_point() + labs(title = "Av
 
 ```
 
-What relationships are there in movie performances over time?
+* What relationships are there in movie performances over time?
 ```{r}
 
 ```
 
-What genres are most successful?
+* What genres are most successful?
 ```{r fig.height=5, fig.width=10}
 
 genres <- colnames(movie[,13:32])
 movie2<- movie %>%
   select(genres,"Revenue","Metascore","Rating") 
-
 movie3 <- data.frame("Genre"=genres, "Avg_Revenue"=NA, "Avg_Metascore"=NA, "Avg_Rating"=NA)
 for(i in 1:20){
   total1 <- 0
@@ -196,18 +197,18 @@ print(g3, vp = define_region(row = 1, col = 3))
 
 ```
 
-Analysis of the most successful directors and actors
+* Analysis of the most successful directors and actors
 ```{r}
 
 ```
 
-####Conclusion
+###Conclusion
 
 
 
-####Team Contribution
+###Team Contribution
 
-Ashley:
+Ashley: In this project, we decided to separate the data analysis section and we all focused on different questions of interest we came up together as a team. I specifically analyzed how genres of a movie contribute to it's success, which was the last question analyzed above. I also organized the sections in our report document so we could be sure to follow the rubric and guidelines, as well as help set up our presentation. 
 
 Tyler:
 
