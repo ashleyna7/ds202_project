@@ -70,8 +70,11 @@ head(movie)
 First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we
 
 ```{r}
+library(tidyverse)
+
 colSums(is.na(movie))
-#movie <- movie %>% drop_na()
+movie <- movie %>% drop_na()
+
 ```
 
 Second, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
@@ -84,7 +87,6 @@ names(movie)[c(6,9)] = c("Runtime", "Revenue")
 Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
 
 ```{r}
-library(tidyverse)
 movie = separate_rows(movie, Genre, sep = ",")
 movie = movie %>%
   mutate(yesno = 1) %>%
@@ -95,7 +97,9 @@ movie = movie %>%
 Lastly, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will somehow need to isolate each actor fo reach movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
 
 ```{r}
+
 movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
+
 ```
 
 
@@ -108,6 +112,12 @@ Which actors and directors are most successful?
 
 What factors are correlated with high ratings and revenue?
 ```{r}
+
+movie2 = movie %>%
+    group_by(Runtime) %>%
+    summarize(mean_rev = mean(Revenue))
+
+ggplot(movie2, aes(x = Runtime, y = mean_rev)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)")
 
 ```
 
