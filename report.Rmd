@@ -37,8 +37,8 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 | Actors             | A comma-separated list of the main stars of the film |
 | Year               | The year that the film released as an integer. |
 | Runtime (Minutes)  | The duration of the film in minutes.|
-| Rating             | User rating for the movie 0-10 |
-| Votes              | Number of votes |
+| Rating             | Average user rating for the movie on a 0-10 scale |
+| Votes              | Total number of ratings given per movie |
 | Revenue (Millions) | Movie revenue in millions |
 | Metascore          | An aggregated average of critic scores. Values are between 0 and 100. Higher scores represent positive reviews. |
 
