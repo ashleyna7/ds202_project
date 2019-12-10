@@ -114,7 +114,46 @@ movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Ac
 
 * Which actors and directors are most successful?
 ```{r}
+actor1 = movie %>% select(Actor1, Rating, Votes, Revenue, Metascore)
+actor2 = movie %>% select(Actor2, Rating, Votes, Revenue, Metascore)
+actor3 = movie %>% select(Actor3, Rating, Votes, Revenue, Metascore)
+actor4 = movie %>% select(Actor4, Rating, Votes, Revenue, Metascore)
+names(actor1)[c(1)] = c("Actor")
+names(actor2)[c(1)] = c("Actor")
+names(actor3)[c(1)] = c("Actor")
+names(actor4)[c(1)] = c("Actor")
+actorSet = rbind(actor1, actor2, actor3, actor4)
+actorSet = actorSet %>% filter(!is.na(Actor))
+for(i in 1:length(actorSet$Actor)){
+  if(substr(actorSet$Actor[i], 1, 1) == " "){
+    actorSet$Actor[i] = substr(actorSet$Actor[i], 2, nchar(actorSet$Actor[i]))
+  }
+}
+actorGrouped = actorSet %>% group_by(Actor) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Metascore = mean(Metascore))
 
+actorFinal = filter(actorGrouped, count>4)
+
+actorRevenue = head(actorFinal[order(-actorFinal$Revenue),], 10)
+actorRevTrim = as.data.frame(actorRevenue)
+
+actorRevTrim$Actor = factor(actorRevTrim$Actor, levels = actorRevTrim[order(actorRevTrim[,"Revenue"]),1])
+
+ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_text(aes(x=Actor,y = Revenue, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Revenue by Actor")
+
+actorMetascore = head(actorFinal[order(-actorFinal$Metascore),], 10)
+actorMetTrim = as.data.frame(actorMetascore)
+
+actorMetTrim$Actor = factor(actorMetTrim$Actor, levels = actorMetTrim[order(actorMetTrim[,"Metascore"]),1])
+ggplot(actorMetTrim) + geom_bar(aes(x = Actor, y = Metascore, fill = Metascore), stat = "identity") + coord_flip() + geom_text(aes(x=Actor,y = Metascore, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Metascore by Actor")
+
+directorGrouped = movie %>% group_by(Director) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Runtime = mean(Runtime), Metascore = mean(Metascore))
+
+directorFinal = filter(directorGrouped, count>2)
+directorRating = head(directorFinal[order(-directorFinal$Rating),], 10)
+directorRatTrim = as.data.frame(directorRating)
+directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRatTrim[order(directorRatTrim[,"Rating"]),1])
+
+ggplot(directorRatTrim) + geom_bar(aes(x = Director, y = Rating, fill = Rating), stat = "identity") + coord_flip() + geom_text(aes(x=Director,y = Rating, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Rating by Director")
 ```
 
 * What factors are correlated with high ratings and revenue?
