@@ -169,9 +169,22 @@ ggplot(movie2, aes(x = Runtime, y = mean_rev)) + geom_point() + labs(title = "Av
 
 ```
 
-* What relationships are there in movie performances over time?
+* How do the number of movies created change over time?
 ```{r}
+movie %>% 
+  ggplot(aes(x = Year)) + geom_histogram(fill = "#e69b22") + labs(y = "Number of Movies", title = "Quantity of Movies Over the Years")
+```
 
+* How do movie ratings compare over time?
+```{r}
+movie %>%
+  ggplot(aes(y = Rating)) + geom_boxplot(fill = "#7afffb") +facet_grid(~Year) + labs(title = "Comparison of Ratings Over the Years")+ theme(axis.text.x = element_blank(), axis.ticks.x=element_blank())
+```
+
+* How have movie revenues changed over the years
+```{r}
+movie %>%
+  ggplot(aes(x = Year, y = Revenue)) + geom_col(fill = "#42f54b") + labs(title = "Movie Revenue through the Years")
 ```
 
 * What genres are most successful?
