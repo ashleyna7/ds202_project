@@ -133,14 +133,16 @@ actorGrouped = actorSet %>% group_by(Actor) %>% summarize(count = n(), Revenue =
 
 actorFinal = filter(actorGrouped, count>4)
 
-actorRevenue = head(actorFinal[order(-actorFinal$Revenue),], 10)
+actorRevenue = rbind(head(actorFinal[order(-actorFinal$Revenue),], 5), head(actorFinal[order(actorFinal$Revenue),], 5))
+
 actorRevTrim = as.data.frame(actorRevenue)
 
 actorRevTrim$Actor = factor(actorRevTrim$Actor, levels = actorRevTrim[order(actorRevTrim[,"Revenue"]),1])
 
-ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_text(aes(x=Actor,y = Revenue, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Revenue by Actor")
+ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_label(aes(x=Actor,y = Revenue, label = count)) + labs(title = "Average Revenue by Actor")
 
-actorMetascore = head(actorFinal[order(-actorFinal$Metascore),], 10)
+actorMetascore = rbind(head(actorFinal[order(-actorFinal$Metascore),], 5), head(actorFinal[order(actorFinal$Metascore),], 5))
+
 actorMetTrim = as.data.frame(actorMetascore)
 
 actorMetTrim$Actor = factor(actorMetTrim$Actor, levels = actorMetTrim[order(actorMetTrim[,"Metascore"]),1])
@@ -149,7 +151,7 @@ ggplot(actorMetTrim) + geom_bar(aes(x = Actor, y = Metascore, fill = Metascore),
 directorGrouped = movie %>% group_by(Director) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Runtime = mean(Runtime), Metascore = mean(Metascore))
 
 directorFinal = filter(directorGrouped, count>2)
-directorRating = head(directorFinal[order(-directorFinal$Rating),], 10)
+directorRating = rbind(head(directorFinal[order(-directorFinal$Rating),], 5), head(directorFinal[order(directorFinal$Rating),], 5))
 directorRatTrim = as.data.frame(directorRating)
 directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRatTrim[order(directorRatTrim[,"Rating"]),1])
 
