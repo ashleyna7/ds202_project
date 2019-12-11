@@ -46,15 +46,13 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 
 We begin by describing our plan of attack for the project. Beginning with the raw data set, we start with some exploration in order to see what needed to be fix or removed. We then move on to wrangling and cleaning the data based on what we found during the exploration.  
 
-For analysis, we will examine a variety of questions. First we find which actors and directors are most commonly involved with successful movies. We define success by looking at a movie's rating, revenue, or metascore. We use the separate method in the 'Actors' column to move it into multiple columns. From there, we find the average movie rating and revenue on an actor and director specific basis.
+For analysis, we will examine a variety of questions. First we will find which actors and directors are most commonly involved with successful movies. We define success by looking at a movie's rating, revenue, or metascore. We use the separate method in the 'Actors' column to move it into multiple columns. From there, we find the average movie rating and revenue on an actor and director specific basis.
 
-We also dive into what factors are correlated with a high rating and revenue. We examine the genre, runtime, and votes to see if they have any significance in predicting rating or revenue. This can be done through ploting the dataset. 
+We also dive into what factors are correlated with a high rating and revenue. Specifically, we look at how runtime effects these success variables and if they have any significance in predicting rating or revenue. This can be done through ploting the dataset. 
 
 We also examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
 
-Additionally, we explore the correlation of the variables we define as success: ratings, revenue, and metascore. We also compare these success variables to how fans recieved the movie by using the variable 'votes'. 
-
-Lastly, we end with an analysis of the most successful directors and actors. We do this by taking the most "successful" directors and actors in terms of the success variables and exploring if there is any other reasons why they are so successful.  
+Lastly, we explore how different genres perform in term of success; including ratings, revenue, and metascore. We also compare these success variables to each other to see which genre is most "successful" and which one is least "successful". 
 
 
 ###Data Exploration, Cleaning and Wrangling 
@@ -65,43 +63,36 @@ We can see from the structure of the data set that each variable type seems to b
 #Install Packages
 library(tidyverse)
 library(ggplot2)
-
 str(movie)
 summary(movie)
 head(movie)
 ```
 
-First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we removed all rows that contained any NAs.
+First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we decided to remove all rows that contained any NAs. It was also crucial to do so in some of our analyses that used averages, as we did not want NAs to effect our results. 
 
 ```{r}
-
 colSums(is.na(movie))
 movie <- movie %>% drop_na()
-
 ```
 
-Second, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
+Second, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are lengthy and difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
 
 ```{r}
-
 movie = movie %>% select(-Rank, -Description)
 names(movie)[c(6,9)] = c("Runtime", "Revenue")
-
 ```
 
-Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a 1, those that are not display a 0.  
+Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a "1" value, and those that are not display a "0" value.  
 
 ```{r}
-
 movie = separate_rows(movie, Genre, sep = ",")
 movie = movie %>%
   mutate(yesno = 1) %>%
   distinct %>%
   spread(Genre, yesno, fill = 0)
-
 ```
 
-Lastly, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will somehow need to isolate each actor fo reach movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
+Lastly, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will need to isolate each actor for each movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
 
 ```{r}
 
@@ -112,7 +103,7 @@ movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Ac
 
 ###Data Analysis
 
-* Which actors and directors are most successful?
+##### Which actors and directors are most successful?
 ```{r}
 actor1 = movie %>% select(Actor1, Rating, Votes, Revenue, Metascore)
 actor2 = movie %>% select(Actor2, Rating, Votes, Revenue, Metascore)
@@ -158,7 +149,7 @@ directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRat
 ggplot(directorRatTrim) + geom_bar(aes(x = Director, y = Rating, fill = Rating), stat = "identity") + coord_flip() + geom_text(aes(x=Director,y = Rating, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Rating by Director")
 ```
 
-* What factors are correlated with high ratings and revenue?
+##### What factors are correlated with high ratings and revenue?
 ```{r}
 
 movie2 = movie %>%
@@ -169,25 +160,28 @@ ggplot(movie2, aes(x = Runtime, y = mean_rev)) + geom_point() + labs(title = "Av
 
 ```
 
-* How do the number of movies created change over time?
+##### How do the number of movies created change over time?
 ```{r}
 movie %>% 
   ggplot(aes(x = Year)) + geom_histogram(fill = "#e69b22") + labs(y = "Number of Movies", title = "Quantity of Movies Over the Years")
 ```
 
-* How do movie ratings compare over time?
+##### How do movie ratings compare over time?
 ```{r}
 movie %>%
   ggplot(aes(y = Rating)) + geom_boxplot(fill = "#7afffb") +facet_grid(~Year) + labs(title = "Comparison of Ratings Over the Years")+ theme(axis.text.x = element_blank(), axis.ticks.x=element_blank())
 ```
 
-* How have movie revenues changed over the years
+##### How have movie revenues changed over the years
 ```{r}
 movie %>%
   ggplot(aes(x = Year, y = Revenue)) + geom_col(fill = "#42f54b") + labs(title = "Movie Revenue through the Years")
 ```
 
-* What genres are most successful?
+##### What genres are most successful?
+
+In the graph below, there are three bar plots that represent the average revenue in millions by genre, the average metascore by genre, and the average rating by genre. This was done by creating a new data frame, which includes variables genre, average revenue, average rating, and average metascore. Each unique genre was represented once in the genre column, and for each unique genre, the averages for revenue, ratings, and metascore could be calculated using a for loop.
+
 ```{r fig.height=5, fig.width=10}
 
 genres <- colnames(movie[,13:32])
@@ -218,7 +212,7 @@ for(i in 1:20){
 g1 <- movie3 %>%
   arrange(desc(Avg_Revenue)) %>%
   ggplot(aes(x=reorder(Genre, Avg_Revenue),y=Avg_Revenue, fill=Genre)) + geom_bar(stat='identity') +
-  coord_flip() + theme(legend.position = "none") + geom_text(aes(label=round(Avg_Revenue, digits=1)), position=position_dodge(width=0.9), hjust=1) +labs(title="Average Revenue by Genre", x="Genre", y="Average Revenue")
+  coord_flip() + theme(legend.position = "none") + geom_text(aes(label=round(Avg_Revenue, digits=1)), position=position_dodge(width=0.9), hjust=1) +labs(title="Average Revenue by Genre", x="Genre", y="Average Revenue (millions)")
 
 g2 <- movie3 %>%
   arrange(desc(Avg_Metascore)) %>%
@@ -251,21 +245,26 @@ print(g3, vp = define_region(row = 1, col = 3))
 
 ```
 
-* Analysis of the most successful directors and actors
-```{r}
+Comparing the three barplots, it is obvious that the genre 'Animation' performed very well. It had the top revenue of any revenue, exceeding the second highest average revenue genre by about \$35 million for a total average of \$192.4 million. Not only did 'Animation' films do well in producing revenue, we can see that they were second in average metascores with an average score of 70.6 out of 100, and fourth in average ratings with a rating of 7.3 out of 10. This means 'Animation' films were generally enjoyed by both critics and IMDb fans.
 
-```
+Conversely, the 'Horror' genre did not perform as well. Comparing the barplots, we see that 'Horror' movies accumulated the smallest amount of revenue out of any genre, which was about \$37.4 million. Additionally, it performed among the bottom five average metascores, with an average score of 56.5 out of 100. Lastly, 'Horror' movies have the least favorable rating by IMDb fans, with an average rating of 6.3 out of 10. Overall, 'Horror' movies generally perform unsuccessfully. 
+
+There are some interesting trends to point out in these graphs. Genres like 'Fantasy', 'Action', and 'Family' recieved success in revenue, as they are among the top six genres for average revenue. However, we can see that these three genres were among the bottom four in both average metascore and average ratings. Thus, generally speaking, 'Fantasy', 'Action', and 'Family' movies generate a lot of revenue, but are not well recieved. This could be because these are genres a majority of the population watch, including children, meaning it can earn a large revenue. But just because a large proportion of the population watches a movie from this genre does not necessarily mean the movie will be well recieved.
+
+Another trend to point out is opposite of the trend above genres. Genres like 'History', 'War' and 'Biography' do not seem to accumulate a ton of revenue. However, they are among the top four for average metascores and they are the top three genres for average ratings. Unlike 'Fantasy', 'Action', and 'Family', generally 'History', 'War' and 'Biography' movies are very well recieved, but do not generate a lot of money. This could be because these three genres a not generally as popular as a lot of people may find them boring and unexciting, meaning they do not generate as much revenue.  
 
 ###Conclusion
 
+One major take away from this project is that you cannot look at a single number when defining success. For one, when looking at which actors are most successful, there was no overlap in the top five actors who recieved the highest average revenue and the top five actors who recieved the highest average metascore. While some actors had success by making a lot of revenue from roles, others had success in their movies being well recieved by critics and fans. Similarly, when looking at which genres are most successful, there is sometimes a big difference in ranking between revenue, metascore, and ratings. For example, could see this in the fact that genres like 'Fantasy', 'Action', and 'Family' recieved high success in revenue but were among the bottom four in both average metascore and average ratings.
 
+Through our analysis, we were able to discover why there are many ways to define the success of a movie. Going forward, it might be interesting to look into why certain actors, directors, and genres have higher success with revenue while others have higher success with critic and fan ratings. Additionally, it would be interesting to figure out why there is an increase in total number of movies being produced every year. 
 
 ###Team Contribution
 
-Ashley: In this project, we decided to separate the data analysis section and we all focused on different questions of interest we came up together as a team. I specifically analyzed how genres of a movie contribute to it's success, which was the last question analyzed above. I also organized the sections in our report document so we could be sure to follow the rubric and guidelines, as well as help set up our presentation. 
+* Ashley: In this project, we decided to separate the data analysis section and we all focused on different questions of interest we came up together as a team. I specifically analyzed how genres of a movie contribute to it's success, which was the last question analyzed above. I also organized our report document so we could be sure to follow the rubric and guidelines, as well as help to set up our presentation. 
 
-Tyler:
+* Tyler: 
 
-Hexiang:
+* Hexiang:
 
-Cameron:
+* Cameron:
