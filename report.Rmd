@@ -151,7 +151,7 @@ directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRat
 ggplot(directorRatTrim) + geom_bar(aes(x = Director, y = Rating, fill = Rating), stat = "identity") + coord_flip() + geom_text(aes(x=Director,y = Rating, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Rating by Director")
 ```
 
-##### What factors are correlated with high ratings and revenue?
+##### How is runtime correlated with high ratings and revenue?
 ```{r}
 
 movie2 = movie %>%
@@ -159,7 +159,13 @@ movie2 = movie %>%
     summarize(mean_rev = mean(Revenue))
 movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
 
-ggplot(movie2, aes(x = Runtime, y = mean_rev, color=group)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)")
+ggplot(movie2, aes(x = Runtime, y = mean_rev, color=group)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)") + stat_smooth(method="lm", se = FALSE)
+
+fit <- lm(mean_rev ~ Runtime, data = movie2)
+
+cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
+cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
+cat("P =",signif(summary(fit)$coef[2,4], 5))
 
 movie2 = movie %>%
     group_by(Runtime) %>%
@@ -167,13 +173,13 @@ movie2 = movie %>%
 
 movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
 
-ggplot(movie2, aes(x = Runtime, y = mean_rat, colour=group)) + geom_point() + labs(title = "Average Rating of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Rating") + geom_smooth(method="lm", se = FALSE, fullrange=TRUE) 
+ggplot(movie2, aes(x = Runtime, y = mean_rat, colour=group)) + geom_point() + labs(title = "Average Rating of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Rating") + stat_smooth(method="lm", se = FALSE)
 
-movie2 = movie %>%
-    group_by(Runtime) %>%
-    summarize(mean_met = mean(Metascore))
+fit <- lm(mean_rat ~ Runtime, data = movie2)
 
-ggplot(movie2, aes(x = Runtime, y = mean_met)) + geom_point() + labs(title = "Average Metascore of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Metascore")
+cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
+cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
+cat("P =",signif(summary(fit)$coef[2,4], 5))
 
 ```
 
@@ -282,6 +288,6 @@ Through our analysis, we were able to discover why there are many ways to define
 
 * Tyler: 
 
-* Hexiang:
+* Hexiang: I worked on cleaning some of the data. I worked on organizing the genre section of our project. I used separate and one hot encoded the movies and their genres. I worked on looking at how runtime is related to high revenue and high ratings from users on IMDb. I worked on create our powerpoint presenation presented in class. 
 
 * Cameron:
