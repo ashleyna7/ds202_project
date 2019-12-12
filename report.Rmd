@@ -17,8 +17,10 @@ Link to Dataset can be found on Kaggle or through this link: https://www.kaggle.
 #### Dataset Overview
 
 ```{r}
+
 # Load dataset
 movie = read.csv("IMDB-Movie-Data.csv")
+
 ```
 
 #### Background
@@ -121,8 +123,23 @@ What factors are correlated with high ratings and revenue?
 movie2 = movie %>%
     group_by(Runtime) %>%
     summarize(mean_rev = mean(Revenue))
+movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
 
-ggplot(movie2, aes(x = Runtime, y = mean_rev)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)")
+ggplot(movie2, aes(x = Runtime, y = mean_rev, color=group)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)")
+
+movie2 = movie %>%
+    group_by(Runtime) %>%
+    summarize(mean_rat = mean(Rating))
+
+movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
+
+ggplot(movie2, aes(x = Runtime, y = mean_rat, colour=group)) + geom_point() + labs(title = "Average Rating of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Rating") + geom_smooth(method="lm", se = FALSE, fullrange=TRUE) 
+
+movie2 = movie %>%
+    group_by(Runtime) %>%
+    summarize(mean_met = mean(Metascore))
+
+ggplot(movie2, aes(x = Runtime, y = mean_met)) + geom_point() + labs(title = "Average Metascore of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Metascore")
 
 ```
 
