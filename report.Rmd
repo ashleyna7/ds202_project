@@ -186,13 +186,18 @@ movie2 = movie %>%
 movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
 
 ggplot(movie2, aes(x = Runtime, y = mean_rev, color=group)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)") + stat_smooth(method="lm", se = FALSE)
+# Scatter plot of runtime vs. mean revenue of movies.
 
 fit <- lm(mean_rev ~ Runtime, data = movie2)
 
 cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
 cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
 cat("P =",signif(summary(fit)$coef[2,4], 5))
+```
 
+In the plot above, it seems like revenue has a positive corrolation with the runtime of a movie. This corrolation peaks at about 150 minutes or 2.5 hour long movies. After that, a negative corrolation begins to occur. 
+
+```{r}
 movie2 = movie %>%
     group_by(Runtime) %>%
     summarize(mean_rat = mean(Rating))
@@ -200,14 +205,17 @@ movie2 = movie %>%
 movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, ifelse(movie2$Runtime <= 90, 3, ifelse(movie2$Runtime <= 120, 4, ifelse(movie2$Runtime <= 150, 5, ifelse(movie2$Runtime <= 180, 6, 7))))))
 
 ggplot(movie2, aes(x = Runtime, y = mean_rat, colour=group)) + geom_point() + labs(title = "Average Rating of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Rating") + stat_smooth(method="lm", se = FALSE)
+# Scatter plot of runtime vs. mean rating of movies.
 
 fit <- lm(mean_rat ~ Runtime, data = movie2)
-
+summary(fit)
 cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
 cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
 cat("P =",signif(summary(fit)$coef[2,4], 5))
 
 ```
+
+In the plot above, there seems to be a postive corrolation between rating and  runtime of a movie. People seem to rate longer movies more highly. However, there may be other factors that contribute the this corrolation. 
 
 #### How do the number of movies created change over time?
 ```{r}
