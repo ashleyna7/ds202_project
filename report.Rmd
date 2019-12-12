@@ -16,18 +16,16 @@ Team Members: Cameron Stocker, Hexiang Zhang, & Tyler Kruzan
 The dataset can be found on Kaggle or through this link:   
 https://www.kaggle.com/PromptCloudHQ/imdb-data
 
-```{r}
-
+```{r include=FALSE}
 # Load dataset
 movie = read.csv("IMDB-Movie-Data.csv")
-
 ```
 
 ### Background
 
-Our choice of a data set came from IMDb and includes data about the 1,000 most popular movies that came out between 2006 and 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. There are some messy variables such as Description, Actors, & Genre that contain lengthy character strings that will need to be parsed and cleaned or simply omitted from the final data we use.
+Our choice of a data set came from IMDb and includes data about the 1,000 most popular movies that came out between 2006 and 2016. Useful variables include Title, Director, Year, Runtime, Rating, Metascore, & Revenue. Below is a table of all variables in the dataset as well as a description for each. There are some messy variables such as Description, Actors, & Genre that contain lengthy character strings that will be parsed and cleaned or simply omitted from the final data we use.
 
-IMDb, which stands for Internet Movie Database, is an online source for data associated with films, TV shows, video games, and other streamable content. For each title, users can find information relating to the starring cast, producers, and plot summaries, as well as both critic and fan reviews. As of May 2019, IMDb had 83 million registered users and approximately 6 million titles, including 516,726 feature films. IMDb ratings are based on user ratings on a scale from 1 to 10. The raw ratings are then filtered and weighted, creating a weighted mean rating for each film. The formula for calculating the weighted rating is $W = \frac{R*v + C*m}{v+m}$, where $R$ is the raw average, $v$ is the number of votes, $m$ is the minimum votes required to be included in the Top 250 (which is currently 25,000), and $C$ is the mean vote for the reports (which is currently 7.0). Below is a table of all variables in the dataset as well as a description for each variable. 
+IMDb, which stands for Internet Movie Database, is an online source for data associated with films, TV shows, video games, and other streamable content. For each title, users can find information relating to the starring cast, producers, and plot summaries, as well as both critic and fan reviews. As of May 2019, IMDb had 83 million registered users and approximately 6 million titles, including 516,726 feature films. IMDb ratings are based on user ratings on a scale from 1 to 10. The raw ratings are then filtered and weighted, creating a weighted mean rating for each film. The formula for calculating the weighted rating is $W = \frac{R*v + C*m}{v+m}$, where $R$ is the raw average, $v$ is the number of votes, $m$ is the minimum votes required to be included in the Top 250 (which is currently 25,000), and $C$ is the mean vote for the reports (which is currently 7.0).  
 
 | Dataset Variables  | Description      |
 | ------------------ | ---------------- |
@@ -46,22 +44,19 @@ IMDb, which stands for Internet Movie Database, is an online source for data ass
 
 ### Pipeline
 
-We begin by describing our plan of attack for the project. Beginning with the raw data set, we start with some exploration in order to see what needed to be fix or removed. We then move on to wrangling and cleaning the data based on what we found during the exploration.  
+We begin by describing our plan of attack for the project. Beginning with the raw data set, we start with some exploration in order to see what looked messy or unusual in order to determine what needs to be fixed or removed. We then move on to wrangling and cleaning the data based on what we found during the exploration.  
 
-For analysis, we will examine a variety of questions. First we will find which actors and directors are most commonly involved with successful movies. We define success by looking at a movie's rating, revenue, or metascore. We use the separate method in the 'Actors' column to move it into multiple columns. From there, we find the average movie rating and revenue on an actor and director specific basis.
+For analysis, we will examine a variety of questions. First we will find which actors and directors are most commonly involved with successful movies. We define success by looking at a movie's rating, revenue, or metascore. We will do this by finding the average movie rating and revenue on an actor and director specific basis.
 
-We also dive into what factors are correlated with a high rating and revenue. Specifically, we look at how runtime effects these success variables and if they have any significance in predicting rating or revenue. This can be done through ploting the dataset. 
+We will also dive into what factors are correlated with a high rating and revenue. Specifically, we look at how runtime effects these success variables and if it has any significance in predicting rating or revenue. This can be done through ploting the dataset. 
 
-We also examine relationships between different factors in a movie over time such as the year it was made and movie performances like runtime, votes, rating, and revenue to see how the components of top movies have changed over the years. This can also be done through plotting the dataset. 
+We also examine relationships between different factors in a movie over time, such as looking at the relationship between the year a film was made with the performance of the film, using variables like runtime, votes, rating, and revenue. We will do this to see how the components of top movies have changed over the years.
 
 Lastly, we explore how different genres perform in term of success; including ratings, revenue, and metascore. We also compare these success variables to each other to see which genre is most "successful" and which one is least "successful". 
 
-
 ### Data Exploration, Cleaning and Wrangling 
 
-We can see from the structure of the data set that each variable type seems to be correct, so no changes were needed there. However, we noticed that there were some problems.
-
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 #Install Packages
 library(tidyverse)
 library(ggplot2)
@@ -70,23 +65,28 @@ summary(movie)
 head(movie)
 ```
 
-First, we noticed a few NAs in the data set and decided to explore more. As we can see below, there are quite a few NAs in the Revenue column. Since this variable is important for our definition of success, we decided to remove all rows that contained any NAs. It was also crucial to do so in some of our analyses that used averages, as we did not want NAs to effect our results. 
+From looking at the structure of the raw data set, we can see that each variable type seems to be correct, so no changes were needed there. However, we noticed that there were some other problems. First, we noticed a few NAs in the data set and decided to explore more. As we can see in the table below, there are quite a few NAs in the Revenue and Metascore column. Since these variables are both important for our definition of success, we decided to remove all rows that contained any NAs. It was also crucial to do so in some of our analyses that used averages, as we did not want NAs to effect our results. 
 
-```{r}
-colSums(is.na(movie))
+```{r echo=FALSE, fig.height=5, fig.width=3, message=FALSE, warning=FALSE}
+#install.packages("knitr")
+library(knitr)
+kable(colSums(is.na(movie)), col.names = c("Count of NAs"))
+```
+
+```{r include=FALSE}
 movie <- movie %>% drop_na()
 ```
 
-Second, some of the variables are messy or need renamed. We decided to drop the Rank and Description columns because these variables are lengthy and difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include the units (minutes and millions) in the name. 
+Second, some of the variables in the data set are messy or need renamed. We decided to drop the Rank and Description columns because these variables are lengthy and difficult to use. Additionally, we do not believe they would add much value to our analysis. Next, we changed the variable names for Runtime and Revenue so that they did not include their units (minutes and millions) in the name, making them easier to use later. 
 
-```{r}
+```{r include=FALSE}
 movie = movie %>% select(-Rank, -Description)
 names(movie)[c(6,9)] = c("Runtime", "Revenue")
 ```
 
-Next, the genre variable shows multiple genres for each movie. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each genre is a column. The movies recognized under a certain genre display a "1" value, and those that are not display a "0" value.  
+Next, the genre variable shows multiple genres for each movie seperated by a comma. In order for this variable to be useful, we need to separate them. We do this by separating the genres and then spreading the column out so each unique genre is it's own column. The movies recognized under a certain genre display a "1" value, and those that are not display a "0" value.  
 
-```{r}
+```{r include=FALSE}
 movie = separate_rows(movie, Genre, sep = ",")
 movie = movie %>%
   mutate(yesno = 1) %>%
@@ -94,12 +94,10 @@ movie = movie %>%
   spread(Genre, yesno, fill = 0)
 ```
 
-Lastly, the Actor variable shows multiple actors for each movie. Again, for this column to be useful, we will need to isolate each actor for each movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.  
+Lastly, the Actor variable shows the most important four actors for each movie separated by a comma. Again, for this column to be useful, we will need to isolate each actor for each movie. We do this by separating the "Actors" column into four different columns: Actor1, Actor2, Actor3, and Actor4.   
 
-```{r}
-
+```{r include=FALSE}
 movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Actor3", "Actor4"))
-
 ```
 
 
@@ -111,7 +109,7 @@ movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Ac
 
 For our actor analysis, we used both the Revenue and Metascore variables to examine 'success'. 
 
-```{r}
+```{r echo=FALSE}
 ###Had to create four different datasets, one with each Actor variable
 actor1 = movie %>% select(Actor1, Rating, Votes, Revenue, Metascore)
 actor2 = movie %>% select(Actor2, Rating, Votes, Revenue, Metascore)
@@ -146,9 +144,10 @@ actorRevTrim$Actor = factor(actorRevTrim$Actor, levels = actorRevTrim[order(acto
 ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_label(aes(x=Actor,y = Revenue, label = count)) + labs(title = "Average Revenue by Actor", y = "Revenue (millions $)")
 ```
 
-In the plot above, the numbers at the end of the bar represent the number of movies that actor was in. Josh Hutcherson had the highest revenue per movie, which is comes from being in the Hunger Games movies. The lowest, Charlotte Gainsbourg, was involved in three movies that didn't have a rating which makes it difficult for those movies to have much success in theatres.
+In the plot above, the numbers at the end of the bars represent the number of movies that specific actor was in. Josh Hutcherson had the highest revenue per movie, which most likely comes from being in the Hunger Games movies which were very successful. The the actor with the lowest revenue per movie, Charlotte Gainsbourg, was involved in three movies. Upon further analysis, we could see that her movies did not have a rating which makes it difficult for those movies to have much success with revenue.
 
-```{r}
+
+```{r echo=FALSE}
 ###Create the metascore data set
 actorMetascore = rbind(head(actorFinal[order(-actorFinal$Metascore),], 5), head(actorFinal[order(actorFinal$Metascore),], 5))
 
@@ -158,13 +157,13 @@ actorMetTrim$Actor = factor(actorMetTrim$Actor, levels = actorMetTrim[order(acto
 ggplot(actorMetTrim) + geom_bar(aes(x = Actor, y = Metascore, fill = Metascore), stat = "identity") + coord_flip() + geom_text(aes(x=Actor,y = Metascore, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Metascore by Actor")
 ```
 
-As you can see from the plot above Rooney Mara had the highest average metascore and Adam Sandler had the lowest. Although Adam Sandler is widely considered to be successful, he has been involved in some comedy movies that had very low ratings and this plot highlights that.
+As we can see from the plot above, Rooney Mara had the highest average metascore while Adam Sandler had the lowest. Although Adam Sandler is widely considered to be successful, he has been involved in some comedy movies that had very low ratings and this plot highlights that.
 
 ##### Director Analysis
 
-For the director analysis, we used the Rating statistic to define 'success'.
+For the director analysis, we used the Rating statistic to define 'success'. As we can see from the plot below, the top 3 directors for average movie rating were Christopher Nolan, Quentin Tarantino, and Martin Scorsese. This is interesting because if you ask people who they think are some of the top directors in the world, you would likely hear these names come up. This plot confirms that belief that these three directors are some of the most successful.
 
-```{r}
+```{r echo=FALSE}
 directorGrouped = movie %>% group_by(Director) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Runtime = mean(Runtime), Metascore = mean(Metascore))
 
 directorFinal = filter(directorGrouped, count>2)
@@ -175,11 +174,9 @@ directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRat
 ggplot(directorRatTrim) + geom_bar(aes(x = Director, y = Rating, fill = Rating), stat = "identity") + coord_flip() + geom_text(aes(x=Director,y = Rating, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Rating by Director")
 ```
 
-As you can see from the plot above, the top 3 directors for average movie rating were Christopher Nolan, Quentin Tarantino, and Martin Scorsese. That is interesting because if you ask any who they think are some of the top directors in the world, you would likely hear these names come up, and this plot confirms that belief.
 
 #### How is runtime correlated with high ratings and revenue?
-```{r}
-
+```{r echo=FALSE}
 movie2 = movie %>%
     group_by(Runtime) %>%
     summarize(mean_rev = mean(Revenue))
@@ -187,17 +184,18 @@ movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, if
 
 ggplot(movie2, aes(x = Runtime, y = mean_rev, color=group)) + geom_point() + labs(title = "Average Revenue of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Revenue (mil)") + stat_smooth(method="lm", se = FALSE)
 # Scatter plot of runtime vs. mean revenue of movies.
-
-fit <- lm(mean_rev ~ Runtime, data = movie2)
-
-cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
-cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
-cat("P =",signif(summary(fit)$coef[2,4], 5))
 ```
 
-In the plot above, it seems like revenue has a positive corrolation with the runtime of a movie. This corrolation peaks at about 150 minutes or 2.5 hour long movies. After that, a negative corrolation begins to occur. 
+\newline In the plot above, we wanted to analyze how the runtime of a movie was related to the amount of revenue it made. As we can see, it appears that the averagae revenue has a positive correlation with the runtime of a movie. To further analyze this correlation, we decided to run a linear regression model to see if this relationship is signficant and if we could use runtime to predict a film's revenue. 
 
-```{r}
+```{r echo=FALSE}
+fit <- lm(mean_rev ~ Runtime, data = movie2)
+summary(fit)
+```
+
+As we can see from the output above, the p-value for the linear regression model is $3.541*10^{-6}$, which is less than any reasonale alpha value. This means the model is significant. Additionally, the p-value for the predictor Runtime coefficient is $3.54*10^{-6}$, which is also significant. This says that in this linear regression model, runtime is a significant predictor of average revenue. On the other hand though, our adjusted $R^2$ value is $0.2089$. This means only about $20\%$ of the variability in the average revenue can be explained by this model while accounting for the number of terms in the model. Overall, due to the nature of p-values, we do not believe runtime is a good predictor of average revenue. 
+
+```{r echo=FALSE}
 movie2 = movie %>%
     group_by(Runtime) %>%
     summarize(mean_rat = mean(Rating))
@@ -206,31 +204,30 @@ movie2$group = ifelse(movie2$Runtime <= 30, 1,ifelse(movie2$Runtime <= 60, 2, if
 
 ggplot(movie2, aes(x = Runtime, y = mean_rat, colour=group)) + geom_point() + labs(title = "Average Rating of Movies for each Runtime") + xlab("Movie Runtime (min)") + ylab("Rating") + stat_smooth(method="lm", se = FALSE)
 # Scatter plot of runtime vs. mean rating of movies.
-
-fit <- lm(mean_rat ~ Runtime, data = movie2)
-summary(fit)
-cat("Adj R2 =",signif(summary(fit)$adj.r.squared, 5))
-cat("y =",signif(fit$coef[[2]], 5), "x +",signif(fit$coef[[1]],5 ))
-cat("P =",signif(summary(fit)$coef[2,4], 5))
-
 ```
 
-In the plot above, there seems to be a postive corrolation between rating and  runtime of a movie. People seem to rate longer movies more highly. However, there may be other factors that contribute the this corrolation. 
+\newline Now, we wanted to analyze how the runtime of a movie effects it's rating. In the plot above, there appears to be a postive corrolation between rating and runtime of a film. People seem to rate longer movies more highly. However, there may be other factors that contribute the this corrolation. To analyze this observation, we again decided to run a linear regression model to see if this relationship is signficant and if we could use runtime to predict a film's rating.
+
+```{r echo=FALSE}
+fit <- lm(mean_rat ~ Runtime, data = movie2)
+summary(fit)
+```
+As we can see from the output above, the p-value for this linear regression model is $1.787*10^{-14}$, which is less than any reasonale alpha value. This means the model is significant. Additionally, the p-value for the predictor Runtime coefficient is $1.79*10^{-14}$, which is also significant. This says that in this linear regression model, runtime is a significant predictor of average rating. Additionally, our adjusted $R^2$ value is $0.4831$. This means about $48\%$ of the variability in the average rating can be explained by this model while accounting for the number of terms in the model. Overall, we believe runtime could be a good predictor of average rating. 
 
 #### How do the number of movies created change over time?
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 movie %>% 
   ggplot(aes(x = Year)) + geom_histogram(fill = "#e69b22") + labs(y = "Number of Movies", title = "Quantity of Movies Over the Years")
 ```
 
 #### How do movie ratings compare over time?
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 movie %>%
   ggplot(aes(y = Rating)) + geom_boxplot(fill = "#7afffb") +facet_grid(~Year) + labs(title = "Comparison of Ratings Over the Years")+ theme(axis.text.x = element_blank(), axis.ticks.x=element_blank())
 ```
 
 #### How have movie revenues changed over the years?
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 movie %>%
   ggplot(aes(x = Year, y = Revenue)) + geom_col(fill = "#42f54b") + labs(title = "Movie Revenue through the Years")
 ```
@@ -238,11 +235,12 @@ movie %>%
 In the three graphs above you can see that the more movies released recently are included in the IMDb Top 1000 movies. Ratings have remained consistent over the years leading us to beleive that the rating variable is not biased to a specific year of movie production. Lastly, you can see that recent movies in the Top 1000 have made more money than those of previous years. 
 
 
+
 #### What genres are most successful?
 
 In the graph below, there are three bar plots that represent the average revenue in millions by genre, the average metascore by genre, and the average rating by genre. This was done by creating a new data frame, which includes variables genre, average revenue, average rating, and average metascore. Each unique genre was represented once in the genre column, and for each unique genre, the averages for revenue, ratings, and metascore could be calculated using a for loop.
 
-```{r fig.height=5, fig.width=10}
+```{r echo=FALSE, fig.height=5, fig.width=10}
 
 genres <- colnames(movie[,13:32])
 movie2<- movie %>%
