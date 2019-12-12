@@ -57,7 +57,7 @@ We also examine relationships between different factors in a movie over time suc
 Lastly, we explore how different genres perform in term of success; including ratings, revenue, and metascore. We also compare these success variables to each other to see which genre is most "successful" and which one is least "successful". 
 
 
-###Data Exploration, Cleaning and Wrangling 
+### Data Exploration, Cleaning and Wrangling 
 
 We can see from the structure of the data set that each variable type seems to be correct, so no changes were needed there. However, we noticed that there were some problems.
 
@@ -103,27 +103,38 @@ movie = movie %>% separate("Actors", sep = ",", into = c("Actor1", "Actor2", "Ac
 ```
 
 
-###Data Analysis
+### Data Analysis
 
-##### Which actors and directors are most successful?
+#### Which actors and directors are most/least successful?
+
+##### Actor Analysis
+
+For our actor analysis, we used both the Revenue and Metascore variables to examine 'success'. 
+
 ```{r}
+###Had to create four different datasets, one with each Actor variable
 actor1 = movie %>% select(Actor1, Rating, Votes, Revenue, Metascore)
 actor2 = movie %>% select(Actor2, Rating, Votes, Revenue, Metascore)
 actor3 = movie %>% select(Actor3, Rating, Votes, Revenue, Metascore)
 actor4 = movie %>% select(Actor4, Rating, Votes, Revenue, Metascore)
+###Then renamed the Actor variable to be "Actor"
 names(actor1)[c(1)] = c("Actor")
 names(actor2)[c(1)] = c("Actor")
 names(actor3)[c(1)] = c("Actor")
 names(actor4)[c(1)] = c("Actor")
+###Combined the 4 datasets through a row bind so that they could be grouped
 actorSet = rbind(actor1, actor2, actor3, actor4)
 actorSet = actorSet %>% filter(!is.na(Actor))
+###Had to go through the actor variable and check for any empty spaces that were formed from the separate function.
 for(i in 1:length(actorSet$Actor)){
   if(substr(actorSet$Actor[i], 1, 1) == " "){
     actorSet$Actor[i] = substr(actorSet$Actor[i], 2, nchar(actorSet$Actor[i]))
   }
 }
+###Group the actors together by average
 actorGrouped = actorSet %>% group_by(Actor) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Metascore = mean(Metascore))
 
+###Decided to only examine actors with 5 or more movies to help prevent any outliers.
 actorFinal = filter(actorGrouped, count>4)
 
 actorRevenue = rbind(head(actorFinal[order(-actorFinal$Revenue),], 5), head(actorFinal[order(actorFinal$Revenue),], 5))
@@ -132,15 +143,28 @@ actorRevTrim = as.data.frame(actorRevenue)
 
 actorRevTrim$Actor = factor(actorRevTrim$Actor, levels = actorRevTrim[order(actorRevTrim[,"Revenue"]),1])
 
-ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_label(aes(x=Actor,y = Revenue, label = count)) + labs(title = "Average Revenue by Actor")
+ggplot(actorRevTrim) + geom_bar(aes(x = Actor, y = Revenue, fill = Revenue), stat = "identity") + coord_flip() + geom_label(aes(x=Actor,y = Revenue, label = count)) + labs(title = "Average Revenue by Actor", y = "Revenue (millions $)")
+```
 
+In the plot above, the numbers at the end of the bar represent the number of movies that actor was in. Josh Hutcherson had the highest revenue per movie, which is comes from being in the Hunger Games movies. The lowest, Charlotte Gainsbourg, was involved in three movies that didn't have a rating which makes it difficult for those movies to have much success in theatres.
+
+```{r}
+###Create the metascore data set
 actorMetascore = rbind(head(actorFinal[order(-actorFinal$Metascore),], 5), head(actorFinal[order(actorFinal$Metascore),], 5))
 
 actorMetTrim = as.data.frame(actorMetascore)
 
 actorMetTrim$Actor = factor(actorMetTrim$Actor, levels = actorMetTrim[order(actorMetTrim[,"Metascore"]),1])
 ggplot(actorMetTrim) + geom_bar(aes(x = Actor, y = Metascore, fill = Metascore), stat = "identity") + coord_flip() + geom_text(aes(x=Actor,y = Metascore, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Metascore by Actor")
+```
 
+As you can see from the plot above Rooney Mara had the highest average metascore and Adam Sandler had the lowest. Although Adam Sandler is widely considered to be successful, he has been involved in some comedy movies that had very low ratings and this plot highlights that.
+
+##### Director Analysis
+
+For the director analysis, we used the Rating statistic to define 'success'.
+
+```{r}
 directorGrouped = movie %>% group_by(Director) %>% summarize(count = n(), Revenue = mean(Revenue),  Rating = mean(Rating), Votes = mean(Votes), Runtime = mean(Runtime), Metascore = mean(Metascore))
 
 directorFinal = filter(directorGrouped, count>2)
@@ -151,7 +175,9 @@ directorRatTrim$Director = factor(directorRatTrim$Director, levels = directorRat
 ggplot(directorRatTrim) + geom_bar(aes(x = Director, y = Rating, fill = Rating), stat = "identity") + coord_flip() + geom_text(aes(x=Director,y = Rating, label = paste(count, "movies")), color = "white", size = 5, position = position_stack(vjust = 0.5)) + labs(title = "Average Rating by Director")
 ```
 
-##### How is runtime correlated with high ratings and revenue?
+As you can see from the plot above, the top 3 directors for average movie rating were Christopher Nolan, Quentin Tarantino, and Martin Scorsese. That is interesting because if you ask any who they think are some of the top directors in the world, you would likely hear these names come up, and this plot confirms that belief.
+
+#### How is runtime correlated with high ratings and revenue?
 ```{r}
 
 movie2 = movie %>%
@@ -183,25 +209,25 @@ cat("P =",signif(summary(fit)$coef[2,4], 5))
 
 ```
 
-##### How do the number of movies created change over time?
+#### How do the number of movies created change over time?
 ```{r}
 movie %>% 
   ggplot(aes(x = Year)) + geom_histogram(fill = "#e69b22") + labs(y = "Number of Movies", title = "Quantity of Movies Over the Years")
 ```
 
-##### How do movie ratings compare over time?
+#### How do movie ratings compare over time?
 ```{r}
 movie %>%
   ggplot(aes(y = Rating)) + geom_boxplot(fill = "#7afffb") +facet_grid(~Year) + labs(title = "Comparison of Ratings Over the Years")+ theme(axis.text.x = element_blank(), axis.ticks.x=element_blank())
 ```
 
-##### How have movie revenues changed over the years
+#### How have movie revenues changed over the years?
 ```{r}
 movie %>%
   ggplot(aes(x = Year, y = Revenue)) + geom_col(fill = "#42f54b") + labs(title = "Movie Revenue through the Years")
 ```
 
-##### What genres are most successful?
+#### What genres are most successful?
 
 In the graph below, there are three bar plots that represent the average revenue in millions by genre, the average metascore by genre, and the average rating by genre. This was done by creating a new data frame, which includes variables genre, average revenue, average rating, and average metascore. Each unique genre was represented once in the genre column, and for each unique genre, the averages for revenue, ratings, and metascore could be calculated using a for loop.
 
@@ -276,13 +302,13 @@ There are some interesting trends to point out in these graphs. Genres like 'Fan
 
 Another trend to point out is opposite of the trend above genres. Genres like 'History', 'War' and 'Biography' do not seem to accumulate a ton of revenue. However, they are among the top four for average metascores and they are the top three genres for average ratings. Unlike 'Fantasy', 'Action', and 'Family', generally 'History', 'War' and 'Biography' movies are very well recieved, but do not generate a lot of money. This could be because these three genres a not generally as popular as a lot of people may find them boring and unexciting, meaning they do not generate as much revenue.  
 
-###Conclusion
+### Conclusion
 
 One major take away from this project is that you cannot look at a single number when defining success. For one, when looking at which actors are most successful, there was no overlap in the top five actors who recieved the highest average revenue and the top five actors who recieved the highest average metascore. While some actors had success by making a lot of revenue from roles, others had success in their movies being well recieved by critics and fans. Similarly, when looking at which genres are most successful, there is sometimes a big difference in ranking between revenue, metascore, and ratings. For example, could see this in the fact that genres like 'Fantasy', 'Action', and 'Family' recieved high success in revenue but were among the bottom four in both average metascore and average ratings.
 
 Through our analysis, we were able to discover why there are many ways to define the success of a movie. Going forward, it might be interesting to look into why certain actors, directors, and genres have higher success with revenue while others have higher success with critic and fan ratings. Additionally, it would be interesting to figure out why there is an increase in total number of movies being produced every year. 
 
-###Team Contribution
+### Team Contribution
 
 * Ashley: In this project, we decided to separate the data analysis section and we all focused on different questions of interest we came up together as a team. I specifically analyzed how genres of a movie contribute to it's success, which was the last question analyzed above. I also organized our report document so we could be sure to follow the rubric and guidelines, as well as help to set up our presentation. 
 
@@ -290,4 +316,4 @@ Through our analysis, we were able to discover why there are many ways to define
 
 * Hexiang: I worked on cleaning some of the data. I worked on organizing the genre section of our project. I used separate and one hot encoded the movies and their genres. I worked on looking at how runtime is related to high revenue and high ratings from users on IMDb. I worked on create our powerpoint presenation presented in class. 
 
-* Cameron:
+* Cameron: I worked on cleaning some of the data. I separated the Actor variable into 4 different actor variables so that we could look at them individually. For analysis, I examined the which actors/directors were the most/least successful by using different variables. I believe the plots were very intuitive and effectively displayed the results we were looking for. I also was there to provide teammates with suggestions on how they could try to improve their analysis.
