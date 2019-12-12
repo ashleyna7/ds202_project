@@ -235,6 +235,9 @@ movie %>%
   ggplot(aes(x = Year, y = Revenue)) + geom_col(fill = "#42f54b") + labs(title = "Movie Revenue through the Years")
 ```
 
+In the three graphs above you can see that the more movies released recently are included in the IMDb Top 1000 movies. Ratings have remained consistent over the years leading us to beleive that the rating variable is not biased to a specific year of movie production. Lastly, you can see that recent movies in the Top 1000 have made more money than those of previous years. 
+
+
 #### What genres are most successful?
 
 In the graph below, there are three bar plots that represent the average revenue in millions by genre, the average metascore by genre, and the average rating by genre. This was done by creating a new data frame, which includes variables genre, average revenue, average rating, and average metascore. Each unique genre was represented once in the genre column, and for each unique genre, the averages for revenue, ratings, and metascore could be calculated using a for loop.
@@ -320,7 +323,7 @@ Through our analysis, we were able to discover why there are many ways to define
 
 * Ashley: In this project, we decided to separate the data analysis section and we all focused on different questions of interest we came up together as a team. I specifically analyzed how genres of a movie contribute to it's success, which was the last question analyzed above. I also organized our report document so we could be sure to follow the rubric and guidelines, as well as help to set up our presentation. 
 
-* Tyler: 
+* Tyler: For this project, I did a lot of research for finding the dataset that we used. Additionally, I looked at the movie data over the time period that the dataset covered of 2006-2016, specifically the variables of revenue, rating, the number of movies produced each year. Lastly, I contributed to drafting our proposal, report, & presentation. 
 
 * Hexiang: I worked on cleaning some of the data. I worked on organizing the genre section of our project. I used separate and one hot encoded the movies and their genres. I worked on looking at how runtime is related to high revenue and high ratings from users on IMDb. I worked on create our powerpoint presenation presented in class. 
 
